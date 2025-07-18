@@ -1,0 +1,589 @@
+---
+name: DataHub Ingestion Framework Taxonomy
+description: Comprehensive taxonomy of ingestion patterns, sources, transformations, and processing modes
+version: 1.0.0
+source_repository: DataHub Open Source
+generated_date: "2025-07-18"
+
+taxonomies:
+  - name: Source Connector Categories
+    description: Classification of data sources by platform type and capabilities
+    categories:
+      - name: SQL and Database Sources
+        description: Relational database and SQL-based platform connectors
+        base_class: "SQLCommonSource"
+        location: "metadata-ingestion/src/datahub/ingestion/source/sql/"
+        characteristics:
+          - "Schema extraction and profiling"
+          - "Table and column lineage"
+          - "Usage statistics collection"
+          - "Incremental ingestion support"
+        sources:
+          - name: Traditional RDBMS
+            platforms:
+              - MySQL
+              - PostgreSQL
+              - Oracle
+              - SQL Server
+              - SQLite
+            capabilities: ["SCHEMA_METADATA", "DATA_PROFILING", "USAGE_STATS", "PLATFORM_INSTANCE"]
+          - name: Cloud Data Warehouses
+            platforms:
+              - Snowflake
+              - BigQuery
+              - Redshift
+              - Athena
+              - Synapse
+            capabilities: ["LINEAGE_COARSE", "LINEAGE_FINE", "USAGE_STATS", "CONTAINERS"]
+          - name: Analytics Engines
+            platforms:
+              - Trino
+              - Presto
+              - ClickHouse
+              - Druid
+              - Impala
+            capabilities: ["SCHEMA_METADATA", "DATA_PROFILING", "USAGE_STATS"]
+          - name: Enterprise Databases
+            platforms:
+              - Hive
+              - Teradata
+              - Vertica
+              - DB2
+              - Informix
+            capabilities: ["SCHEMA_METADATA", "DATA_PROFILING", "CONTAINERS"]
+
+      - name: Data Lake and Object Storage Sources
+        description: File-based and object storage platform connectors
+        base_utilities: "data_lake_common"
+        location: "metadata-ingestion/src/datahub/ingestion/source/data_lake/"
+        characteristics:
+          - "File system crawling"
+          - "Schema inference from files"
+          - "Profiling of structured data"
+          - "Partition and path-based organization"
+        sources:
+          - name: Cloud Object Storage
+            platforms:
+              - AWS S3
+              - Google Cloud Storage
+              - Azure Blob Storage
+              - MinIO
+            capabilities: ["SCHEMA_METADATA", "DATA_PROFILING", "CONTAINERS"]
+          - name: Data Lake Formats
+            platforms:
+              - Delta Lake
+              - Apache Iceberg
+              - Apache Hudi
+              - Parquet
+            capabilities: ["SCHEMA_METADATA", "DATA_PROFILING", "LINEAGE_COARSE"]
+
+      - name: Business Intelligence Sources
+        description: BI and analytics platform connectors
+        location: "metadata-ingestion/src/datahub/ingestion/source/"
+        characteristics:
+          - "Dashboard and chart extraction"
+          - "Report metadata capture"
+          - "User usage analytics"
+          - "Lineage from BI to data sources"
+        sources:
+          - name: Enterprise BI Platforms
+            platforms:
+              - Tableau
+              - Power BI
+              - Qlik Sense
+              - MicroStrategy
+            capabilities: ["LINEAGE_COARSE", "LINEAGE_FINE", "USAGE_STATS", "PLATFORM_INSTANCE"]
+          - name: Modern Analytics Platforms
+            platforms:
+              - Looker
+              - Superset
+              - Metabase
+              - Mode
+              - Preset
+            capabilities: ["LINEAGE_COARSE", "USAGE_STATS", "CONTAINERS"]
+          - name: Cloud BI Services
+            platforms:
+              - Sigma
+              - Redash
+              - Grafana
+              - Hex
+            capabilities: ["LINEAGE_COARSE", "USAGE_STATS"]
+
+      - name: Data Processing and ETL Sources
+        description: Data pipeline and transformation platform connectors
+        location: "metadata-ingestion/src/datahub/ingestion/source/"
+        characteristics:
+          - "Pipeline metadata extraction"
+          - "Transformation lineage tracking"
+          - "Job execution history"
+          - "Data quality monitoring"
+        sources:
+          - name: Data Transformation Tools
+            platforms:
+              - DBT Core
+              - DBT Cloud
+              - Dataform
+            capabilities: ["LINEAGE_COARSE", "LINEAGE_FINE", "CONTAINERS"]
+          - name: ETL Platforms
+            platforms:
+              - Fivetran
+              - Stitch
+              - Airbyte
+              - Talend
+            capabilities: ["LINEAGE_COARSE", "USAGE_STATS", "PLATFORM_INSTANCE"]
+          - name: Data Integration
+            platforms:
+              - Kafka Connect
+              - NiFi
+              - Airflow
+              - Prefect
+            capabilities: ["LINEAGE_COARSE", "CONTAINERS"]
+
+      - name: Streaming and Event Sources
+        description: Real-time streaming platform connectors
+        location: "metadata-ingestion/src/datahub/ingestion/source/"
+        characteristics:
+          - "Topic and stream metadata"
+          - "Schema registry integration"
+          - "Consumer group tracking"
+          - "Event format documentation"
+        sources:
+          - name: Message Brokers
+            platforms:
+              - Apache Kafka
+              - Apache Pulsar
+              - RabbitMQ
+              - Amazon Kinesis
+            capabilities: ["SCHEMA_METADATA", "CONTAINERS", "PLATFORM_INSTANCE"]
+          - name: Schema Registries
+            platforms:
+              - Confluent Schema Registry
+              - AWS Glue Schema Registry
+              - Azure Schema Registry
+            capabilities: ["SCHEMA_METADATA", "CONTAINERS"]
+
+      - name: Cloud Platform Sources
+        description: Cloud-native service connectors
+        location: "metadata-ingestion/src/datahub/ingestion/source/"
+        characteristics:
+          - "Cloud service integration"
+          - "Auto-discovery capabilities"
+          - "Native API integration"
+          - "Multi-region support"
+        sources:
+          - name: AWS Services
+            platforms:
+              - AWS Glue
+              - AWS SageMaker
+              - AWS Lambda
+              - AWS Step Functions
+            capabilities: ["SCHEMA_METADATA", "LINEAGE_COARSE", "CONTAINERS"]
+          - name: Azure Services
+            platforms:
+              - Azure Data Factory
+              - Azure Synapse
+              - Azure Machine Learning
+            capabilities: ["SCHEMA_METADATA", "LINEAGE_COARSE", "CONTAINERS"]
+          - name: Google Cloud Services
+            platforms:
+              - Google Cloud Composer
+              - Google Cloud Functions
+              - Vertex AI
+            capabilities: ["SCHEMA_METADATA", "LINEAGE_COARSE", "CONTAINERS"]
+          - name: Databricks
+            platforms:
+              - Databricks Unity Catalog
+              - Databricks Jobs
+              - Databricks ML
+            capabilities: ["SCHEMA_METADATA", "LINEAGE_COARSE", "CONTAINERS", "USAGE_STATS"]
+
+      - name: Identity and Access Sources
+        description: Identity management and access control connectors
+        location: "metadata-ingestion/src/datahub/ingestion/source/"
+        characteristics:
+          - "User and group extraction"
+          - "Role and permission mapping"
+          - "Access audit trails"
+          - "Identity provider integration"
+        sources:
+          - name: Directory Services
+            platforms:
+              - LDAP
+              - Active Directory
+              - Azure AD
+              - Okta
+            capabilities: ["PLATFORM_INSTANCE"]
+          - name: Identity Providers
+            platforms:
+              - Auth0
+              - Keycloak
+              - Google Workspace
+            capabilities: ["PLATFORM_INSTANCE"]
+
+      - name: API and Schema Sources
+        description: API documentation and schema connectors
+        location: "metadata-ingestion/src/datahub/ingestion/source/"
+        characteristics:
+          - "API endpoint documentation"
+          - "Schema definition extraction"
+          - "Request/response mapping"
+          - "API usage analytics"
+        sources:
+          - name: API Documentation
+            platforms:
+              - OpenAPI/Swagger
+              - GraphQL
+              - REST APIs
+            capabilities: ["SCHEMA_METADATA"]
+          - name: Schema Formats
+            platforms:
+              - JSON Schema
+              - Avro Schema
+              - Protocol Buffers
+            capabilities: ["SCHEMA_METADATA"]
+
+      - name: Specialized Domain Sources
+        description: Domain-specific platform connectors
+        location: "metadata-ingestion/src/datahub/ingestion/source/"
+        characteristics:
+          - "Domain-specific metadata"
+          - "Specialized data models"
+          - "Custom entity types"
+          - "Domain expertise required"
+        sources:
+          - name: Machine Learning
+            platforms:
+              - MLflow
+              - Kubeflow
+              - Weights & Biases
+              - Neptune
+            capabilities: ["SCHEMA_METADATA", "LINEAGE_COARSE", "CONTAINERS"]
+          - name: Feature Stores
+            platforms:
+              - Feast
+              - Tecton
+              - Hopsworks
+            capabilities: ["SCHEMA_METADATA", "LINEAGE_COARSE"]
+          - name: Data Quality
+            platforms:
+              - Great Expectations
+              - Deequ
+              - Monte Carlo
+            capabilities: ["SCHEMA_METADATA", "CONTAINERS"]
+          - name: NoSQL Databases
+            platforms:
+              - MongoDB
+              - Cassandra
+              - DynamoDB
+              - Neo4j
+            capabilities: ["SCHEMA_METADATA", "CONTAINERS"]
+
+      - name: Utility and Testing Sources
+        description: Utility sources for testing and migration
+        location: "metadata-ingestion/src/datahub/ingestion/source/"
+        characteristics:
+          - "Testing and development"
+          - "Data migration support"
+          - "Debugging capabilities"
+          - "Format conversion"
+        sources:
+          - name: File-based Sources
+            platforms:
+              - File (JSON/CSV)
+              - DataHub export
+              - Demo data generator
+            capabilities: ["SCHEMA_METADATA"]
+          - name: Enrichment Sources
+            platforms:
+              - CSV enricher
+              - Tag enricher
+              - Ownership enricher
+            capabilities: ["SCHEMA_METADATA"]
+
+  - name: Transformation Patterns
+    description: Categories of metadata transformations during ingestion
+    categories:
+      - name: Dataset Transformations
+        description: Transformations that modify dataset-level metadata
+        base_class: "Transformer"
+        location: "metadata-ingestion/src/datahub/ingestion/transform/"
+        transformations:
+          - name: Metadata Addition
+            transformers:
+              - add_dataset_ownership
+              - add_dataset_tags
+              - add_dataset_terms
+              - add_dataset_properties
+              - add_dataset_browse_path
+              - add_dataset_dataproduct
+            purpose: "Enrich datasets with additional metadata"
+          - name: Schema Transformations
+            transformers:
+              - add_dataset_schema_tags
+              - add_dataset_schema_terms
+            purpose: "Modify schema-level metadata"
+          - name: Domain and Classification
+            transformers:
+              - dataset_domain
+              - dataset_domain_based_on_tags
+              - tags_to_terms
+            purpose: "Classify and organize datasets"
+          - name: Extraction and Derivation
+            transformers:
+              - extract_dataset_tags
+              - extract_ownership_from_tags
+            purpose: "Derive metadata from existing information"
+          - name: Cleanup and Maintenance
+            transformers:
+              - pattern_cleanup_dataset_usage_user
+              - pattern_cleanup_ownership
+              - remove_dataset_ownership
+              - mark_dataset_status
+            purpose: "Clean and maintain metadata quality"
+
+      - name: Generic Transformations
+        description: Generic transformations applicable to multiple entity types
+        transformations:
+          - name: Universal Transformers
+            transformers:
+              - generic_aspect_transformer
+              - auto_helper_transformer
+              - replace_external_url
+            purpose: "Apply transformations across entity types"
+
+  - name: Sink Patterns
+    description: Destinations for processed metadata
+    categories:
+      - name: DataHub Sinks
+        description: Sinks that write to DataHub instances
+        base_class: "Sink"
+        location: "metadata-ingestion/src/datahub/ingestion/sink/"
+        sinks:
+          - name: datahub_rest
+            description: "REST API sink (most common)"
+            characteristics:
+              - "HTTP-based communication"
+              - "Synchronous processing"
+              - "Authentication support"
+              - "Retry and error handling"
+            usage: "Production deployments"
+          - name: datahub_kafka
+            description: "Kafka-based sink"
+            characteristics:
+              - "Asynchronous processing"
+              - "High throughput"
+              - "Event-driven architecture"
+              - "Reliable delivery"
+            usage: "High-volume ingestion"
+          - name: datahub_lite
+            description: "Lightweight local sink"
+            characteristics:
+              - "Local development"
+              - "Minimal dependencies"
+              - "Fast testing"
+            usage: "Development and testing"
+
+      - name: File and Output Sinks
+        description: Sinks that write to files or console
+        sinks:
+          - name: file
+            description: "Write to local files (JSON/CSV)"
+            characteristics:
+              - "Structured output formats"
+              - "Batch processing"
+              - "Offline analysis"
+            usage: "Data export and analysis"
+          - name: console
+            description: "Print to console"
+            characteristics:
+              - "Real-time output"
+              - "Debugging support"
+              - "Human-readable format"
+            usage: "Development and debugging"
+
+      - name: Testing and Development Sinks
+        description: Sinks for testing and development purposes
+        sinks:
+          - name: blackhole
+            description: "Discard all data (for testing)"
+            characteristics:
+              - "No output generation"
+              - "Performance testing"
+              - "Pipeline validation"
+            usage: "Testing and benchmarking"
+
+  - name: Ingestion Modes and Patterns
+    description: Different approaches to metadata ingestion
+    categories:
+      - name: Processing Modes
+        description: How ingestion processes metadata
+        modes:
+          - name: Batch Ingestion
+            description: "One-time extraction of metadata"
+            characteristics:
+              - "Scheduled execution"
+              - "Full or incremental snapshots"
+              - "Consistent point-in-time view"
+              - "Resource-intensive"
+            use_cases: ["Initial data discovery", "Scheduled updates", "Compliance reporting"]
+          - name: Streaming Ingestion
+            description: "Continuous metadata updates"
+            characteristics:
+              - "Real-time processing"
+              - "Event-driven updates"
+              - "Low latency"
+              - "Resource-efficient"
+            use_cases: ["Real-time data catalogs", "Change notifications", "Live dashboards"]
+
+      - name: State Management
+        description: How ingestion manages state between runs
+        patterns:
+          - name: Stateless Ingestion
+            description: "No state tracking between runs"
+            characteristics:
+              - "Simple implementation"
+              - "Full refresh each run"
+              - "No dependency tracking"
+              - "Higher resource usage"
+            use_cases: ["Small datasets", "Infrequent updates", "Simple pipelines"]
+          - name: Stateful Ingestion
+            description: "Track state between runs"
+            characteristics:
+              - "Incremental processing"
+              - "Checkpoint management"
+              - "Stale entity removal"
+              - "Complex state management"
+            components:
+              - "Checkpointing system"
+              - "State providers (DataHub, file-based)"
+              - "Incremental extraction"
+              - "Deletion detection"
+            use_cases: ["Large datasets", "Frequent updates", "Production pipelines"]
+
+  - name: Configuration and Recipe Patterns
+    description: Common patterns for configuring ingestion pipelines
+    categories:
+      - name: Basic Configuration Structure
+        description: Standard recipe configuration format
+        structure:
+          source:
+            type: "<source_type>"
+            config: "<source_specific_config>"
+          transformers:
+            - type: "<transformer_type>"
+              config: "<transformer_config>"
+          sink:
+            type: "<sink_type>"
+            config: "<sink_config>"
+          pipeline_name: "Optional pipeline identifier"
+          run_id: "Optional run identifier"
+
+      - name: Advanced Configuration Features
+        description: Advanced configuration options
+        features:
+          - name: Stateful Ingestion Config
+            structure:
+              source:
+                config:
+                  stateful_ingestion:
+                    enabled: true
+                    state_provider:
+                      type: "datahub | file"
+                      config: "<provider_config>"
+            purpose: "Enable incremental processing"
+          - name: Multi-instance Support
+            structure:
+              source:
+                config:
+                  platform_instance: "instance_name"
+                  platform_instance_map: "<mapping_config>"
+            purpose: "Support multiple instances of same platform"
+          - name: Data Hub API Configuration
+            structure:
+              datahub_api:
+                server: "http://localhost:8080"
+                token: "<api_token>"
+                timeout: 30
+            purpose: "Configure DataHub connection"
+
+  - name: Extension and Customization Patterns
+    description: How to extend the ingestion framework
+    categories:
+      - name: Custom Source Development
+        description: Creating custom source connectors
+        requirements:
+          - "Implement Source interface"
+          - "Define source configuration class"
+          - "Implement get_workunits method"
+          - "Handle error cases and cleanup"
+        patterns:
+          - "Configuration validation"
+          - "Connection testing"
+          - "Pagination handling"
+          - "Error recovery"
+
+      - name: Custom Transformer Development
+        description: Creating custom transformations
+        requirements:
+          - "Implement Transformer interface"
+          - "Define transformer configuration"
+          - "Transform work units"
+          - "Maintain metadata integrity"
+        patterns:
+          - "Pattern-based transformations"
+          - "Conditional transformations"
+          - "Metadata enrichment"
+          - "Data validation"
+
+      - name: Custom Sink Development
+        description: Creating custom sink destinations
+        requirements:
+          - "Implement Sink interface"
+          - "Handle work unit processing"
+          - "Manage connection lifecycle"
+          - "Implement error handling"
+        patterns:
+          - "Batch processing"
+          - "Error recovery"
+          - "Connection pooling"
+          - "Format conversion"
+
+  - name: Quality and Reliability Patterns
+    description: Patterns for ensuring ingestion quality and reliability
+    categories:
+      - name: Error Handling
+        description: How ingestion handles errors and failures
+        patterns:
+          - "Graceful degradation"
+          - "Retry mechanisms"
+          - "Dead letter queues"
+          - "Error reporting"
+          - "Partial failure handling"
+
+      - name: Monitoring and Observability
+        description: Patterns for monitoring ingestion health
+        patterns:
+          - "Metrics collection"
+          - "Progress tracking"
+          - "Error rate monitoring"
+          - "Performance benchmarking"
+          - "Audit logging"
+
+      - name: Data Quality
+        description: Ensuring metadata quality during ingestion
+        patterns:
+          - "Schema validation"
+          - "Data profiling"
+          - "Lineage validation"
+          - "Completeness checking"
+          - "Freshness monitoring"
+
+usage_notes:
+  - "Sources are organized by platform type for easier discovery"
+  - "Transformers can be chained for complex metadata processing"
+  - "Stateful ingestion is recommended for production use"
+  - "Configuration follows a consistent YAML structure"
+  - "Custom extensions follow plugin architecture patterns"
+  - "Error handling is built into all components"
+  - "Performance optimization is available through batch processing"
+  - "Monitoring and observability are integral to the framework"

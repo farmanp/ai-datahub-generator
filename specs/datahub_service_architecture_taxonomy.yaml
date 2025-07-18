@@ -1,0 +1,469 @@
+---
+name: DataHub Service Architecture Taxonomy
+description: Comprehensive taxonomy of DataHub service patterns and architectural components
+version: 1.0.0
+source_repository: DataHub Open Source
+generated_date: "2025-07-18"
+
+taxonomies:
+  - name: Service Layer Architecture
+    description: Categorization of services by their architectural layer and responsibility
+    categories:
+      - name: Core Entity Services
+        description: Services managing fundamental entity operations and persistence
+        location: "metadata-service/services/src/main/java/com/linkedin/metadata/entity/"
+        characteristics:
+          - "Handle CRUD operations for metadata entities"
+          - "Manage aspect versioning and storage"
+          - "Interface with underlying storage systems"
+          - "Follow repository-like patterns with strong typing"
+        services:
+          - name: EntityService
+            description: Core interface for entity operations
+            responsibilities:
+              - "Entity existence checks and validation"
+              - "Aspect retrieval and updates"
+              - "Batch operations for performance"
+              - "Transaction support and consistency"
+            patterns: ["Repository Pattern", "Batch Processing", "Strong Typing"]
+          - name: DeleteEntityService
+            description: Specialized service for entity deletion workflows
+            responsibilities:
+              - "Soft and hard deletion management"
+              - "Cascade deletion handling"
+              - "Cleanup of related entities"
+            patterns: ["Soft Delete", "Cascade Operations"]
+          - name: RetentionService
+            description: Manages data retention policies
+            responsibilities:
+              - "Retention policy enforcement"
+              - "Automatic data cleanup"
+              - "Compliance with data governance"
+            patterns: ["Policy-based Processing", "Scheduled Operations"]
+          - name: SearchIndicesService
+            description: Coordinates search index updates
+            responsibilities:
+              - "Search index synchronization"
+              - "Elasticsearch integration"
+              - "Index lifecycle management"
+            patterns: ["Event-driven Updates", "Index Management"]
+
+      - name: Domain-Specific Business Services
+        description: Services focused on specific business domains and high-level operations
+        location: "metadata-service/services/src/main/java/com/linkedin/metadata/service/"
+        characteristics:
+          - "Extend BaseService for common functionality"
+          - "Focus on specific entity types or business domains"
+          - "Provide high-level operations beyond basic CRUD"
+          - "Use composition over inheritance"
+        services:
+          - name: LineageService
+            description: Manages dataset, chart, and dashboard lineage relationships
+            responsibilities:
+              - "Lineage graph construction"
+              - "Impact analysis"
+              - "Lineage visualization support"
+            patterns: ["Graph Processing", "Relationship Management"]
+          - name: DomainService
+            description: Handles data domain management
+            responsibilities:
+              - "Domain assignment and validation"
+              - "Domain hierarchy management"
+              - "Domain-based access control"
+            patterns: ["Hierarchical Management", "Access Control"]
+          - name: OwnerService
+            description: Manages ownership assignments
+            responsibilities:
+              - "Ownership assignment and validation"
+              - "Owner notification"
+              - "Ownership inheritance rules"
+            patterns: ["Assignment Management", "Notification"]
+          - name: TagService
+            description: Handles tagging operations
+            responsibilities:
+              - "Tag assignment and validation"
+              - "Tag propagation rules"
+              - "Tag hierarchy management"
+            patterns: ["Tagging Strategy", "Rule-based Propagation"]
+          - name: FormService
+            description: Manages metadata forms and assignments
+            responsibilities:
+              - "Form definition management"
+              - "Form response handling"
+              - "Form-based metadata collection"
+            patterns: ["Form Management", "Dynamic Schema"]
+
+      - name: Event-Driven Services
+        description: Services that process events asynchronously from Kafka topics
+        location: "metadata-jobs/"
+        characteristics:
+          - "Consume events from Kafka topics"
+          - "Process metadata changes asynchronously"
+          - "Maintain eventual consistency"
+          - "Use Spring Kafka listeners"
+        services:
+          - name: MetadataChangeProposalsProcessor
+            description: Processes Metadata Change Proposals (MCPs)
+            responsibilities:
+              - "MCP validation and processing"
+              - "Entity aspect updates"
+              - "Change event generation"
+            patterns: ["Event Sourcing", "Asynchronous Processing"]
+          - name: MetadataChangeEventsProcessor
+            description: Handles Metadata Change Events (MCEs)
+            responsibilities:
+              - "Legacy MCE processing"
+              - "Event transformation"
+              - "Backward compatibility"
+            patterns: ["Event Processing", "Legacy Support"]
+          - name: DataHubUsageEventsProcessor
+            description: Processes usage analytics events
+            responsibilities:
+              - "Usage statistics collection"
+              - "Analytics data aggregation"
+              - "Usage reporting"
+            patterns: ["Analytics Processing", "Data Aggregation"]
+          - name: PlatformEventProcessor
+            description: Handles platform-level events
+            responsibilities:
+              - "System event processing"
+              - "Platform state management"
+              - "Administrative operations"
+            patterns: ["Platform Management", "System Events"]
+
+      - name: Search and Discovery Services
+        description: Services providing search, autocomplete, and discovery capabilities
+        location: "metadata-service/services/src/main/java/com/linkedin/metadata/search/"
+        characteristics:
+          - "Interface with Elasticsearch"
+          - "Provide complex query capabilities"
+          - "Support aggregations and faceted search"
+          - "Use adapter pattern for Elasticsearch APIs"
+        services:
+          - name: EntitySearchService
+            description: Entity-specific search operations
+            responsibilities:
+              - "Full-text search across entities"
+              - "Faceted search and filtering"
+              - "Search result ranking"
+            patterns: ["Search Abstraction", "Faceted Search"]
+          - name: LineageSearchService
+            description: Lineage-aware search capabilities
+            responsibilities:
+              - "Lineage-based search"
+              - "Impact analysis queries"
+              - "Dependency discovery"
+            patterns: ["Graph Search", "Relationship Queries"]
+          - name: RecommendationsService
+            description: Search-based recommendations
+            responsibilities:
+              - "Content recommendations"
+              - "Similar entity suggestions"
+              - "Usage-based recommendations"
+            patterns: ["Recommendation Engine", "Content Discovery"]
+
+      - name: Graph Services
+        description: Services managing relationship graphs and traversal operations
+        location: "metadata-service/services/src/main/java/com/linkedin/metadata/graph/"
+        characteristics:
+          - "Manage relationship graphs between entities"
+          - "Support complex traversal operations"
+          - "Optimize for relationship queries"
+          - "Provide graph database abstraction"
+        services:
+          - name: GraphService
+            description: Core graph operations interface
+            responsibilities:
+              - "Graph relationship management"
+              - "Node and edge operations"
+              - "Graph traversal algorithms"
+            patterns: ["Graph Database Abstraction", "Traversal Algorithms"]
+          - name: LineageGraphService
+            description: Specialized service for lineage relationships
+            responsibilities:
+              - "Lineage graph construction"
+              - "Lineage path discovery"
+              - "Lineage impact analysis"
+            patterns: ["Specialized Graph Operations", "Lineage Analysis"]
+
+      - name: System Services
+        description: Infrastructure-level services handling cross-cutting concerns
+        characteristics:
+          - "Infrastructure-level responsibilities"
+          - "Cross-cutting concerns"
+          - "System-wide management"
+          - "Singleton pattern implementation"
+        services:
+          - name: SystemMetadataService
+            description: Tracks internal system metadata
+            responsibilities:
+              - "System metadata tracking"
+              - "Internal state management"
+              - "System health monitoring"
+            patterns: ["System Monitoring", "Internal State"]
+          - name: TimeseriesAspectService
+            description: Handles time-series data aspects
+            responsibilities:
+              - "Time-series data management"
+              - "Temporal queries"
+              - "Data aggregation over time"
+            patterns: ["Time-series Processing", "Temporal Queries"]
+          - name: SchemaRegistryService
+            description: Manages schema definitions
+            responsibilities:
+              - "Schema versioning"
+              - "Schema validation"
+              - "Schema evolution management"
+            patterns: ["Schema Management", "Version Control"]
+          - name: TraceService
+            description: Distributed tracing support
+            responsibilities:
+              - "Request tracing"
+              - "Performance monitoring"
+              - "Distributed system observability"
+            patterns: ["Distributed Tracing", "Observability"]
+
+      - name: Utility and Support Services
+        description: Helper services providing reusable functionality
+        characteristics:
+          - "Stateless operations"
+          - "Reusable functionality"
+          - "Feature-specific support"
+          - "Utility patterns"
+        services:
+          - name: DataHubUsageService
+            description: Usage tracking and analytics
+            responsibilities:
+              - "Usage event collection"
+              - "Analytics reporting"
+              - "Usage statistics"
+            patterns: ["Analytics Collection", "Usage Tracking"]
+          - name: TimelineService
+            description: Entity change timeline management
+            responsibilities:
+              - "Change timeline construction"
+              - "Historical view generation"
+              - "Audit trail management"
+            patterns: ["Timeline Management", "Audit Trail"]
+          - name: RecommendationsService
+            description: Content recommendations
+            responsibilities:
+              - "Content recommendation algorithms"
+              - "User behavior analysis"
+              - "Personalization"
+            patterns: ["Recommendation Algorithms", "Personalization"]
+
+  - name: API Layer Architecture
+    description: Categorization of API services and their interaction patterns
+    categories:
+      - name: REST API Resources
+        description: RestLi-based resources handling HTTP operations
+        location: "metadata-service/restli-servlet-impl/"
+        characteristics:
+          - "LinkedIn Rest.li framework"
+          - "Standardized CRUD operations"
+          - "API versioning support"
+          - "Batch operation capabilities"
+        resources:
+          - name: EntityResource
+            description: Main entity CRUD endpoints
+            endpoints:
+              - "GET /entities/{urn}"
+              - "POST /entities"
+              - "DELETE /entities/{urn}"
+            patterns: ["CRUD Operations", "Batch Support"]
+          - name: AspectResource
+            description: Aspect-specific operations
+            endpoints:
+              - "GET /aspects/{urn}"
+              - "POST /aspects"
+            patterns: ["Aspect Management", "Versioning"]
+          - name: Relationships
+            description: Graph relationship endpoints
+            endpoints:
+              - "GET /relationships"
+              - "POST /relationships"
+            patterns: ["Graph Operations", "Relationship Management"]
+          - name: Analytics
+            description: Usage analytics endpoints
+            endpoints:
+              - "GET /analytics/usage"
+              - "POST /analytics/events"
+            patterns: ["Analytics API", "Event Collection"]
+
+      - name: GraphQL Resolvers
+        description: GraphQL schema resolvers with data fetching logic
+        location: "datahub-graphql-core/src/main/java/com/linkedin/datahub/graphql/resolvers/"
+        characteristics:
+          - "GraphQL schema implementation"
+          - "Authentication and authorization"
+          - "Data fetching optimization"
+          - "Batch loading support"
+        resolver_types:
+          - name: Entity Resolvers
+            description: Domain-specific entity resolvers
+            examples: ["DatasetResolver", "DashboardResolver", "ChartResolver"]
+            patterns: ["Domain-specific Logic", "Entity Loading"]
+          - name: Mutation Resolvers
+            description: Handle create, update, delete operations
+            examples: ["CreateTagResolver", "UpdateOwnershipResolver"]
+            patterns: ["Mutation Operations", "Data Modification"]
+          - name: Query Resolvers
+            description: Handle read operations and queries
+            examples: ["SearchResolver", "GetEntityResolver"]
+            patterns: ["Query Operations", "Data Retrieval"]
+          - name: Field Resolvers
+            description: Resolve specific fields within types
+            examples: ["OwnershipResolver", "LineageResolver"]
+            patterns: ["Field-level Resolution", "Lazy Loading"]
+
+  - name: Service Interaction Patterns
+    description: Common patterns for service communication and interaction
+    categories:
+      - name: Synchronous Communication
+        description: Direct service-to-service communication patterns
+        patterns:
+          - name: Direct Injection
+            description: Services injected via Spring DI
+            characteristics:
+              - "Constructor injection"
+              - "Type-safe dependencies"
+              - "Compile-time validation"
+            usage: "Business services calling entity services"
+          - name: Layered Architecture
+            description: Clear separation between architectural layers
+            flow: "REST/GraphQL → Business Services → Entity Services → Storage"
+            characteristics:
+              - "Unidirectional dependencies"
+              - "Clear responsibility boundaries"
+              - "Testable layers"
+
+      - name: Asynchronous Communication
+        description: Event-driven communication patterns
+        patterns:
+          - name: Event Publishing
+            description: Services publishing events to Kafka
+            characteristics:
+              - "Kafka producer integration"
+              - "Event schema validation"
+              - "Reliable delivery"
+            usage: "Entity changes triggering downstream updates"
+          - name: Event Consumption
+            description: Services consuming events from Kafka
+            characteristics:
+              - "Kafka consumer groups"
+              - "Event processing pipelines"
+              - "Error handling and retry"
+            usage: "Search index updates, notifications"
+
+      - name: Common Service Patterns
+        description: Recurring patterns across service implementations
+        patterns:
+          - name: Batch Operations
+            description: Services supporting batch processing
+            characteristics:
+              - "Bulk entity operations"
+              - "Performance optimization"
+              - "Reduced API calls"
+            examples: ["Batch entity retrieval", "Bulk tag assignment"]
+          - name: Operation Context
+            description: Context passing for authentication and auditing
+            characteristics:
+              - "Authentication information"
+              - "Audit trail"
+              - "Authorization context"
+            usage: "All service operations"
+          - name: Aspect Lifecycle
+            description: Services managing aspect versioning
+            characteristics:
+              - "Version management"
+              - "Change tracking"
+              - "Historical preservation"
+            usage: "Entity services, timeline services"
+          - name: Soft Delete Semantics
+            description: Services supporting soft deletion
+            characteristics:
+              - "Status-based deletion"
+              - "Data preservation"
+              - "Reversible operations"
+            usage: "Entity deletion, cleanup operations"
+
+  - name: Service Quality Patterns
+    description: Patterns for service reliability, performance, and monitoring
+    categories:
+      - name: Error Handling
+        description: Consistent error handling across services
+        patterns:
+          - name: Exception Hierarchy
+            description: Structured exception types
+            types:
+              - "ValidationException"
+              - "AuthorizationException"
+              - "ResourceNotFoundException"
+              - "SystemException"
+          - name: Error Propagation
+            description: Consistent error propagation
+            characteristics:
+              - "Structured error responses"
+              - "Error context preservation"
+              - "Client-friendly messages"
+
+      - name: Performance Optimization
+        description: Patterns for service performance
+        patterns:
+          - name: Caching
+            description: Multi-level caching strategies
+            levels:
+              - "Application-level caching"
+              - "Database query caching"
+              - "Search result caching"
+          - name: Batch Processing
+            description: Bulk operation optimization
+            characteristics:
+              - "Reduced database roundtrips"
+              - "Bulk API operations"
+              - "Batched event processing"
+
+      - name: Monitoring and Observability
+        description: Service monitoring and observability patterns
+        patterns:
+          - name: Metrics Collection
+            description: Service-level metrics
+            metrics:
+              - "Request latency"
+              - "Error rates"
+              - "Throughput"
+          - name: Distributed Tracing
+            description: Request tracing across services
+            characteristics:
+              - "Request correlation"
+              - "Performance analysis"
+              - "Error diagnosis"
+
+deployment_considerations:
+  - name: Scaling Patterns
+    description: How services scale in production
+    patterns:
+      - "Stateless service design"
+      - "Horizontal scaling capability"
+      - "Load balancer compatibility"
+  - name: Configuration Management
+    description: Service configuration patterns
+    patterns:
+      - "Environment-specific configuration"
+      - "Feature flags support"
+      - "Dynamic configuration updates"
+  - name: Security Patterns
+    description: Security considerations across services
+    patterns:
+      - "Authentication at API boundaries"
+      - "Authorization in business logic"
+      - "Audit logging throughout"
+
+usage_notes:
+  - "Services follow Spring Boot patterns with dependency injection"
+  - "Event-driven services use Kafka for asynchronous processing"
+  - "All services implement authentication and authorization"
+  - "Service interfaces are designed for testability"
+  - "Common patterns are abstracted into base classes"
+  - "Service implementations support both synchronous and asynchronous operations"

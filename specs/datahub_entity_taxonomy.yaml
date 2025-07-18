@@ -1,0 +1,396 @@
+---
+name: DataHub Entity Type Taxonomy
+description: Comprehensive taxonomy of all entity types in DataHub, categorized by business domain and technical purpose
+version: 1.0.0
+source_repository: DataHub Open Source
+generated_date: "2025-07-18"
+
+taxonomies:
+  - name: Core Business Entities
+    description: Primary entities representing data assets and business concepts
+    categories:
+      - name: Data Platform Infrastructure
+        description: Entities representing data platforms and infrastructure components
+        entities:
+          - name: dataPlatform
+            description: Data platforms like MySQL, Snowflake, etc.
+            examples: ["urn:li:dataPlatform:mysql", "urn:li:dataPlatform:snowflake"]
+            key_aspects: ["dataPlatformInfo"]
+          - name: container
+            description: Logical containers for hierarchical organization
+            examples: ["urn:li:container:database", "urn:li:container:schema"]
+            key_aspects: ["containerProperties", "ownership", "domains"]
+          - name: dataPlatformInstance
+            description: Specific deployments of data platforms
+            examples: ["urn:li:dataPlatformInstance:(urn:li:dataPlatform:mysql,prod-instance)"]
+            key_aspects: ["dataPlatformInstanceProperties"]
+
+      - name: Data Assets
+        description: Core data objects and processing workflows
+        entities:
+          - name: dataset
+            description: Tables, views, streams, and other data assets
+            examples: ["urn:li:dataset:(urn:li:dataPlatform:mysql,db.table,PROD)"]
+            key_aspects: ["datasetProperties", "schemaMetadata", "ownership", "upstreamLineage"]
+          - name: dataFlow
+            description: Orchestration workflows like Airflow DAGs
+            examples: ["urn:li:dataFlow:(airflow,dag_id,cluster)"]
+            key_aspects: ["dataFlowInfo", "ownership", "dataJobInputOutput"]
+          - name: dataJob
+            description: Individual tasks within data workflows
+            examples: ["urn:li:dataJob:(urn:li:dataFlow:(airflow,dag_id,cluster),task_id)"]
+            key_aspects: ["dataJobInfo", "dataJobInputOutput", "ownership"]
+          - name: dataProcess
+            description: Generic data processing entities
+            examples: ["urn:li:dataProcess:spark-job"]
+            key_aspects: ["dataProcessInfo", "ownership"]
+          - name: dataProcessInstance
+            description: Runtime instances of data processing jobs
+            examples: ["urn:li:dataProcessInstance:run-123"]
+            key_aspects: ["dataProcessInstanceProperties", "dataProcessInstanceRunEvent"]
+
+      - name: Analytics and BI
+        description: Entities for business intelligence and analytics
+        entities:
+          - name: chart
+            description: Visualizations and reports from BI tools
+            examples: ["urn:li:chart:(looker,chart_id)"]
+            key_aspects: ["chartInfo", "chartQuery", "ownership", "inputFields"]
+          - name: dashboard
+            description: Collections of charts and visualizations
+            examples: ["urn:li:dashboard:(tableau,dashboard_id)"]
+            key_aspects: ["dashboardInfo", "ownership", "inputFields"]
+          - name: notebook
+            description: Analysis notebooks (Jupyter, etc.)
+            examples: ["urn:li:notebook:(jupyter,notebook_id)"]
+            key_aspects: ["notebookInfo", "notebookContent", "ownership"]
+          - name: query
+            description: Saved queries and SQL statements
+            examples: ["urn:li:query:(mode,query_id,2023-01-01T00:00:00.000Z)"]
+            key_aspects: ["queryProperties", "querySubjects"]
+
+      - name: Machine Learning
+        description: ML/AI entities for model management
+        entities:
+          - name: mlModel
+            description: Machine learning models
+            examples: ["urn:li:mlModel:(sagemaker,model_name,PROD)"]
+            key_aspects: ["mlModelProperties", "ownership", "institutionalMemory"]
+          - name: mlModelGroup
+            description: Collections of related ML models
+            examples: ["urn:li:mlModelGroup:(sagemaker,model_group,PROD)"]
+            key_aspects: ["mlModelGroupProperties", "ownership"]
+          - name: mlModelDeployment
+            description: Deployed instances of ML models
+            examples: ["urn:li:mlModelDeployment:(sagemaker,deployment_id,PROD)"]
+            key_aspects: ["mlModelDeploymentProperties", "ownership"]
+          - name: mlFeatureTable
+            description: Feature store tables
+            examples: ["urn:li:mlFeatureTable:(feast,feature_table_name)"]
+            key_aspects: ["mlFeatureTableProperties", "ownership"]
+          - name: mlFeature
+            description: Individual ML features
+            examples: ["urn:li:mlFeature:(namespace,feature_name)"]
+            key_aspects: ["mlFeatureProperties", "ownership"]
+          - name: mlPrimaryKey
+            description: Primary keys for ML features
+            examples: ["urn:li:mlPrimaryKey:(namespace,key_name)"]
+            key_aspects: ["mlPrimaryKeyProperties", "ownership"]
+
+      - name: Identity and Access
+        description: Entities for user management and access control
+        entities:
+          - name: corpuser
+            description: Individual users and accounts
+            examples: ["urn:li:corpuser:john.doe"]
+            key_aspects: ["corpUserInfo", "corpUserCredentials", "corpUserStatus"]
+          - name: corpGroup
+            description: Groups of users
+            examples: ["urn:li:corpGroup:data-team"]
+            key_aspects: ["corpGroupInfo", "ownership"]
+          - name: role
+            description: Named roles for access control
+            examples: ["urn:li:role:data-analyst"]
+            key_aspects: ["roleProperties"]
+          - name: dataHubRole
+            description: DataHub-specific platform roles
+            examples: ["urn:li:dataHubRole:admin"]
+            key_aspects: ["dataHubRoleInfo"]
+
+      - name: Governance and Documentation
+        description: Entities for data governance and business documentation
+        entities:
+          - name: glossaryTerm
+            description: Business terminology and definitions
+            examples: ["urn:li:glossaryTerm:customer"]
+            key_aspects: ["glossaryTermInfo", "ownership"]
+          - name: glossaryNode
+            description: Hierarchical glossary categories
+            examples: ["urn:li:glossaryNode:business-concepts"]
+            key_aspects: ["glossaryNodeInfo", "ownership"]
+          - name: tag
+            description: Simple labels for categorization
+            examples: ["urn:li:tag:pii"]
+            key_aspects: ["tagProperties", "ownership"]
+          - name: domain
+            description: Business domains for organizing assets
+            examples: ["urn:li:domain:sales"]
+            key_aspects: ["domainProperties", "ownership"]
+          - name: businessAttribute
+            description: Business-defined custom attributes
+            examples: ["urn:li:businessAttribute:cost-center"]
+            key_aspects: ["businessAttributeInfo"]
+
+      - name: Data Quality and Testing
+        description: Entities for monitoring and testing data quality
+        entities:
+          - name: assertion
+            description: Data quality rules and monitors
+            examples: ["urn:li:assertion:freshness-check"]
+            key_aspects: ["assertionInfo", "assertionRunEvent"]
+          - name: test
+            description: DataHub test definitions
+            examples: ["urn:li:test:data-quality-test"]
+            key_aspects: ["testInfo", "testResults"]
+          - name: incident
+            description: Data quality incidents and issues
+            examples: ["urn:li:incident:data-outage-123"]
+            key_aspects: ["incidentInfo", "incidentStatus"]
+
+      - name: Schema and Structure
+        description: Entities for data schema and structural metadata
+        entities:
+          - name: schemaField
+            description: Individual schema fields
+            examples: ["urn:li:schemaField:(urn:li:dataset:(urn:li:dataPlatform:mysql,db.table,PROD),field_name)"]
+            key_aspects: ["schemaFieldInfo", "globalTags"]
+          - name: erModelRelationship
+            description: Entity-relationship model relationships
+            examples: ["urn:li:erModelRelationship:customer-order"]
+            key_aspects: ["erModelRelationshipProperties"]
+
+      - name: Collaboration
+        description: Entities for user collaboration and social features
+        entities:
+          - name: post
+            description: User posts and comments
+            examples: ["urn:li:post:123"]
+            key_aspects: ["postInfo", "postContent"]
+          - name: dataHubView
+            description: Saved views and filters
+            examples: ["urn:li:dataHubView:my-datasets"]
+            key_aspects: ["dataHubViewInfo"]
+
+      - name: Advanced Features
+        description: Advanced DataHub features and data products
+        entities:
+          - name: dataContract
+            description: Data contracts and SLAs
+            examples: ["urn:li:dataContract:customer-data-sla"]
+            key_aspects: ["dataContractProperties", "dataContractStatus"]
+          - name: dataProduct
+            description: Higher-level data product offerings
+            examples: ["urn:li:dataProduct:customer-360"]
+            key_aspects: ["dataProductProperties", "ownership"]
+          - name: application
+            description: Applications consuming data
+            examples: ["urn:li:application:customer-portal"]
+            key_aspects: ["applicationInfo", "ownership"]
+          - name: ownershipType
+            description: Custom ownership type definitions
+            examples: ["urn:li:ownershipType:data-steward"]
+            key_aspects: ["ownershipTypeInfo"]
+          - name: versionSet
+            description: Version tracking for related entities
+            examples: ["urn:li:versionSet:model-v1"]
+            key_aspects: ["versionSetProperties"]
+
+      - name: Data Modeling Extensions
+        description: Entities for extending DataHub's data model
+        entities:
+          - name: entityType
+            description: DataHub entity type definitions
+            examples: ["urn:li:entityType:customEntity"]
+            key_aspects: ["entityTypeInfo"]
+          - name: dataType
+            description: Custom data type definitions
+            examples: ["urn:li:dataType:customType"]
+            key_aspects: ["dataTypeInfo"]
+          - name: structuredProperty
+            description: Custom structured properties
+            examples: ["urn:li:structuredProperty:businessMetric"]
+            key_aspects: ["structuredPropertyDefinition"]
+          - name: form
+            description: Dynamic forms for metadata collection
+            examples: ["urn:li:form:data-classification"]
+            key_aspects: ["formInfo"]
+
+      - name: UI and User Experience
+        description: Entities for user interface customization
+        entities:
+          - name: dataHubPageTemplate
+            description: Page templates for UI customization
+            examples: ["urn:li:dataHubPageTemplate:dataset-overview"]
+            key_aspects: ["dataHubPageTemplateInfo"]
+          - name: dataHubPageModule
+            description: Page modules and components
+            examples: ["urn:li:dataHubPageModule:lineage-widget"]
+            key_aspects: ["dataHubPageModuleInfo"]
+
+      - name: External Resources
+        description: Entities for external or unmodeled resources
+        entities:
+          - name: platformResource
+            description: Generic external platform resources
+            examples: ["urn:li:platformResource:external-api"]
+            key_aspects: ["platformResourceInfo"]
+
+  - name: System Internal Entities
+    description: Entities used internally by DataHub platform for operations and management
+    categories:
+      - name: Security and Access Management
+        description: Internal entities for security and access control
+        entities:
+          - name: dataHubPolicy
+            description: Access control policies
+            examples: ["urn:li:dataHubPolicy:view-dataset-policy"]
+            key_aspects: ["dataHubPolicyInfo"]
+          - name: dataHubSecret
+            description: Encrypted secrets storage
+            examples: ["urn:li:dataHubSecret:db-password"]
+            key_aspects: ["dataHubSecretValue"]
+          - name: dataHubAccessToken
+            description: API access tokens
+            examples: ["urn:li:dataHubAccessToken:api-token-123"]
+            key_aspects: ["dataHubAccessTokenInfo"]
+          - name: inviteToken
+            description: User invitation tokens
+            examples: ["urn:li:inviteToken:invite-123"]
+            key_aspects: ["inviteTokenInfo"]
+
+      - name: Ingestion and Integration
+        description: Entities for managing data ingestion processes
+        entities:
+          - name: dataHubIngestionSource
+            description: Ingestion source configurations
+            examples: ["urn:li:dataHubIngestionSource:mysql-prod"]
+            key_aspects: ["dataHubIngestionSourceInfo"]
+          - name: dataHubExecutionRequest
+            description: Async execution requests
+            examples: ["urn:li:dataHubExecutionRequest:ingestion-run-123"]
+            key_aspects: ["dataHubExecutionRequestInfo"]
+          - name: dataHubConnection
+            description: External system connections
+            examples: ["urn:li:dataHubConnection:mysql-connection"]
+            key_aspects: ["dataHubConnectionInfo"]
+
+      - name: System Management
+        description: Entities for platform configuration and management
+        entities:
+          - name: dataHubRetention
+            description: Data retention policies
+            examples: ["urn:li:dataHubRetention:dataset.ownership"]
+            key_aspects: ["dataHubRetentionInfo"]
+          - name: globalSettings
+            description: System-wide configuration settings
+            examples: ["urn:li:globalSettings:ui-config"]
+            key_aspects: ["globalSettingsInfo"]
+          - name: telemetry
+            description: Usage analytics and telemetry
+            examples: ["urn:li:telemetry:search-events"]
+            key_aspects: ["telemetryInfo"]
+          - name: dataHubUpgrade
+            description: System upgrade tracking
+            examples: ["urn:li:dataHubUpgrade:v0.10.0"]
+            key_aspects: ["dataHubUpgradeInfo"]
+
+      - name: Workflow and State Management
+        description: Entities for workflow and process state tracking
+        entities:
+          - name: dataHubStepState
+            description: Workflow step state tracking
+            examples: ["urn:li:dataHubStepState:onboarding-step-1"]
+            key_aspects: ["dataHubStepStateInfo"]
+          - name: dataHubPersona
+            description: User personas and categorization
+            examples: ["urn:li:dataHubPersona:data-analyst"]
+            key_aspects: ["dataHubPersonaInfo"]
+          - name: dataHubAction
+            description: Automated system actions
+            examples: ["urn:li:dataHubAction:auto-tag-pii"]
+            key_aspects: ["dataHubActionInfo"]
+
+      - name: API Support
+        description: Entities for API documentation and support
+        entities:
+          - name: dataHubOpenAPISchema
+            description: OpenAPI schema definitions
+            examples: ["urn:li:dataHubOpenAPISchema:entities-api"]
+            key_aspects: ["dataHubOpenAPISchemaInfo"]
+
+common_aspects:
+  description: Aspects commonly used across multiple entity types
+  aspects:
+    - name: ownership
+      description: Entity ownership information
+      applicable_to: "Most core entities"
+    - name: status
+      description: Entity status (active, deprecated, etc.)
+      applicable_to: "Most core entities"
+    - name: globalTags
+      description: Tags for categorization and labeling
+      applicable_to: "Most core entities"
+    - name: glossaryTerms
+      description: Business terminology associations
+      applicable_to: "Most core entities"
+    - name: browsePaths
+      description: Hierarchical navigation paths
+      applicable_to: "Most core entities"
+    - name: institutionalMemory
+      description: Documentation and knowledge links
+      applicable_to: "Most core entities"
+    - name: domains
+      description: Business domain assignments
+      applicable_to: "Most core entities"
+    - name: structuredProperties
+      description: Custom structured metadata properties
+      applicable_to: "Most core entities"
+    - name: forms
+      description: Form responses and metadata collection
+      applicable_to: "Most core entities"
+    - name: testResults
+      description: Test execution results
+      applicable_to: "Entities with testing capabilities"
+    - name: subTypes
+      description: Entity sub-categorization
+      applicable_to: "Entities with sub-types"
+
+entity_relationships:
+  description: Common relationship patterns between entities
+  relationships:
+    - type: hierarchical
+      description: Parent-child relationships
+      examples: ["container → dataset", "dataFlow → dataJob"]
+    - type: lineage
+      description: Data flow relationships
+      examples: ["dataset → dataset (upstream/downstream)"]
+    - type: membership
+      description: Group membership relationships
+      examples: ["corpUser → corpGroup", "corpUser/corpGroup → role"]
+    - type: association
+      description: Structural associations
+      examples: ["dataset → schema → schemaField"]
+    - type: ownership
+      description: Ownership relationships
+      examples: ["any entity → corpUser/corpGroup"]
+    - type: classification
+      description: Classification relationships
+      examples: ["any entity → tag/glossaryTerm/domain"]
+
+usage_notes:
+  - "Entity URNs follow the pattern: urn:li:<entityType>:(<key_components>)"
+  - "All entities support versioned aspects for historical tracking"
+  - "Core entities support rich metadata through multiple aspect types"
+  - "System entities are primarily for DataHub internal operations"
+  - "Entity Registry configuration is stored in entity-registry.yml"
+  - "Entities can be extended with custom aspects and structured properties"

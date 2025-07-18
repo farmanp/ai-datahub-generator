@@ -1,0 +1,504 @@
+---
+name: DataHub Metadata Lifecycle Taxonomy
+description: Comprehensive taxonomy of metadata lifecycle stages, event patterns, and state management in DataHub
+version: 1.0.0
+source_repository: DataHub Open Source
+generated_date: "2025-07-18"
+
+taxonomies:
+  - name: Metadata Event Architecture
+    description: Event-driven architecture for metadata changes and processing
+    categories:
+      - name: Event Types
+        description: Different types of events in the metadata lifecycle
+        events:
+          - name: MetadataChangeEvent (MCE)
+            description: "Legacy metadata change event format (deprecated)"
+            status: "Deprecated"
+            schema_components:
+              - "proposedSnapshot: Complete entity snapshot"
+              - "proposedDelta: Incremental changes"
+              - "auditHeader: Audit information"
+            processing:
+              - "Processed by MetadataChangeEventsProcessor"
+              - "Converted to MCP format internally"
+            topic: "MetadataChangeEvent_v4"
+            use_cases: ["Legacy system integration", "Backward compatibility"]
+
+          - name: MetadataChangeProposal (MCP)
+            description: "Current standard for proposing metadata changes"
+            status: "Current Standard"
+            schema_components:
+              - "entityType: Type of entity being changed"
+              - "entityUrn: Unique identifier for entity"
+              - "aspectName: Name of aspect being changed"
+              - "aspect: Aspect data"
+              - "changeType: Type of change (CREATE, UPSERT, DELETE, RESTATE, PATCH)"
+            processing:
+              - "Processed by MetadataChangeProposalsProcessor"
+              - "Batch processing via BatchMetadataChangeProposalsProcessor"
+            topic: "MetadataChangeProposal_v1"
+            change_types:
+              - CREATE: "Create new entity aspect"
+              - UPSERT: "Insert or update aspect"
+              - DELETE: "Remove aspect"
+              - RESTATE: "Restate existing aspect"
+              - PATCH: "Partial update of aspect"
+            use_cases: ["Real-time updates", "Batch operations", "API changes"]
+
+          - name: MetadataChangeLog (MCL)
+            description: "Final committed metadata change record"
+            status: "Final State"
+            schema_components:
+              - "All MCP fields plus:"
+              - "previousAspectValue: Previous aspect state"
+              - "previousSystemMetadata: Previous system metadata"
+              - "created: Audit timestamp"
+            processing:
+              - "Generated after successful MCP processing"
+              - "Consumed by downstream systems"
+            topics:
+              - "MetadataChangeLog_Versioned_v1: For versioned aspects"
+              - "MetadataChangeLog_Timeseries_v1: For timeseries aspects"
+            use_cases: ["Audit trails", "Downstream notifications", "Search indexing"]
+
+      - name: Failed Event Types
+        description: Events representing processing failures
+        events:
+          - name: FailedMetadataChangeProposal
+            description: "Failed MCP with error details"
+            purpose: "Track processing failures for debugging"
+            components:
+              - "Original MCP data"
+              - "Error message and stack trace"
+              - "Failure timestamp"
+          - name: FailedMetadataChangeEvent
+            description: "Failed MCE with error details"
+            purpose: "Track legacy event failures"
+            components:
+              - "Original MCE data"
+              - "Error information"
+              - "Retry attempts"
+
+  - name: Processing Modes and Patterns
+    description: Different approaches to processing metadata events
+    categories:
+      - name: Real-time Processing
+        description: Immediate processing of metadata changes
+        characteristics:
+          - "Low latency updates"
+          - "Immediate consistency"
+          - "Interactive user experience"
+          - "Single event processing"
+        processors:
+          - name: MetadataChangeProposalsProcessor
+            description: "Processes individual MCPs as they arrive"
+            characteristics:
+              - "Single-threaded processing"
+              - "Immediate feedback"
+              - "Real-time validation"
+            use_cases: ["Interactive UI updates", "API calls", "Real-time notifications"]
+
+      - name: Batch Processing
+        description: Bulk processing of metadata changes for efficiency
+        characteristics:
+          - "Higher throughput"
+          - "Optimized resource usage"
+          - "Eventual consistency"
+          - "Bulk operations"
+        processors:
+          - name: BatchMetadataChangeProposalsProcessor
+            description: "Processes multiple MCPs together"
+            characteristics:
+              - "Multi-threaded processing"
+              - "Bulk database operations"
+              - "Reduced overhead"
+            use_cases: ["Large ingestion runs", "Data migration", "Bulk updates"]
+
+      - name: Specialized Processing
+        description: Specialized processors for specific event types
+        processors:
+          - name: DataHubUsageEventsProcessor
+            description: "Processes usage analytics events"
+            characteristics:
+              - "Time-series data handling"
+              - "Analytics aggregation"
+              - "Usage pattern analysis"
+            use_cases: ["Usage analytics", "Popular datasets", "User behavior tracking"]
+          - name: PlatformEventProcessor
+            description: "Handles platform-level events"
+            characteristics:
+              - "System state management"
+              - "Administrative operations"
+              - "Platform configuration"
+            use_cases: ["System administration", "Platform configuration", "Operational events"]
+
+  - name: Metadata Lifecycle Stages
+    description: Sequential stages in the metadata lifecycle
+    categories:
+      - name: Proposal Stage
+        description: Initial metadata change proposal
+        characteristics:
+          - "Change request submitted"
+          - "Validation pending"
+          - "Rollback possible"
+        validations:
+          - "Schema validation"
+          - "Business rule validation"
+          - "Authorization checks"
+          - "Referential integrity"
+        outcomes:
+          - "Accepted for processing"
+          - "Rejected with error"
+          - "Queued for batch processing"
+
+      - name: Validation Stage
+        description: Comprehensive validation of proposed changes
+        validation_types:
+          - name: Schema Validation
+            description: "Validate against PDL schemas"
+            checks:
+              - "Field type validation"
+              - "Required field presence"
+              - "Constraint validation"
+              - "Format validation"
+          - name: Business Rule Validation
+            description: "Validate against business rules"
+            checks:
+              - "Entity existence validation"
+              - "Relationship validation"
+              - "Data quality rules"
+              - "Compliance requirements"
+          - name: Authorization Validation
+            description: "Validate user permissions"
+            checks:
+              - "Entity-level permissions"
+              - "Operation permissions"
+              - "Aspect-level permissions"
+              - "Domain-based access control"
+
+      - name: Persistence Stage
+        description: Storing validated metadata changes
+        characteristics:
+          - "Atomic operations"
+          - "Version management"
+          - "Consistency guarantees"
+          - "Rollback capabilities"
+        storage_operations:
+          - name: Aspect Versioning
+            description: "Version management for aspects"
+            versioning_strategy:
+              - "Latest version stored as version 0"
+              - "Historical versions as incremental numbers"
+              - "Automatic version increment"
+            storage_pattern:
+              - "Version 0: Current/latest"
+              - "Version 1, 2, 3, ...: Historical"
+          - name: Database Storage
+            description: "Primary database persistence"
+            operations:
+              - "INSERT: New aspects"
+              - "UPDATE: Existing aspects"
+              - "SOFT DELETE: Status-based deletion"
+              - "HARD DELETE: Physical removal"
+
+      - name: Logging Stage
+        description: Generate change logs for audit and downstream processing
+        characteristics:
+          - "Immutable audit trail"
+          - "Downstream notification"
+          - "Change history preservation"
+          - "Event streaming"
+        log_generation:
+          - name: Audit Trail Creation
+            description: "Create permanent audit records"
+            components:
+              - "Change timestamp"
+              - "Actor information"
+              - "Previous state"
+              - "New state"
+              - "Change reason"
+          - name: Downstream Notification
+            description: "Notify downstream systems"
+            mechanisms:
+              - "Kafka topic publishing"
+              - "WebSocket notifications"
+              - "API callbacks"
+              - "Email notifications"
+
+      - name: Indexing Stage
+        description: Update search and graph indices
+        characteristics:
+          - "Search optimization"
+          - "Graph relationship updates"
+          - "Cache invalidation"
+          - "Performance optimization"
+        indexing_operations:
+          - name: Search Index Updates
+            description: "Update Elasticsearch indices"
+            operations:
+              - "Document creation/update"
+              - "Field indexing"
+              - "Facet updates"
+              - "Full-text search preparation"
+          - name: Graph Index Updates
+            description: "Update relationship graphs"
+            operations:
+              - "Node creation/update"
+              - "Edge creation/update"
+              - "Relationship indexing"
+              - "Traversal optimization"
+          - name: Cache Management
+            description: "Manage cached data"
+            operations:
+              - "Cache invalidation"
+              - "Cache warming"
+              - "Cache consistency"
+              - "Performance optimization"
+
+      - name: Consumption Stage
+        description: Metadata consumption by end users and systems
+        characteristics:
+          - "User interface display"
+          - "API access"
+          - "Analytics consumption"
+          - "Integration usage"
+        consumption_channels:
+          - name: Frontend Display
+            description: "User interface consumption"
+            features:
+              - "Entity detail pages"
+              - "Search results"
+              - "Dashboard views"
+              - "Lineage visualization"
+          - name: API Access
+            description: "Programmatic access"
+            apis:
+              - "REST API endpoints"
+              - "GraphQL queries"
+              - "Bulk export APIs"
+              - "Streaming APIs"
+          - name: Analytics Consumption
+            description: "Analytics and reporting"
+            features:
+              - "Usage analytics"
+              - "Governance reports"
+              - "Compliance dashboards"
+              - "Trend analysis"
+
+  - name: Versioning and History Management
+    description: How DataHub manages metadata versions and history
+    categories:
+      - name: Aspect Versioning Strategy
+        description: Versioning approach for metadata aspects
+        strategy:
+          - name: Latest Version Access
+            description: "Optimized access to current data"
+            implementation:
+              - "Version 0: Always latest"
+              - "Direct access without version lookup"
+              - "Optimized query performance"
+              - "Real-time updates"
+          - name: Historical Version Storage
+            description: "Preservation of historical data"
+            implementation:
+              - "Incremental version numbers (1, 2, 3, ...)"
+              - "Complete aspect snapshots"
+              - "Immutable historical records"
+              - "Audit trail preservation"
+          - name: Version Resolution
+            description: "Automatic version management"
+            implementation:
+              - "System-managed version increments"
+              - "Conflict resolution"
+              - "Version gap handling"
+              - "Cleanup policies"
+
+      - name: Timeline and History Services
+        description: Services providing historical views of metadata
+        services:
+          - name: TimelineService
+            description: "Provides historical timeline views"
+            capabilities:
+              - "Change event aggregation"
+              - "Timeline visualization data"
+              - "Historical trend analysis"
+              - "Change frequency metrics"
+            implementation:
+              - "Default 7-day lookback window"
+              - "Configurable time ranges"
+              - "Efficient query patterns"
+              - "Cached timeline data"
+          - name: Change Event Generators
+            description: "Generate semantic change events"
+            capabilities:
+              - "Human-readable change descriptions"
+              - "UI-friendly change summaries"
+              - "Contextual change information"
+              - "Change categorization"
+
+      - name: Audit and Compliance
+        description: Audit trail and compliance features
+        features:
+          - name: Complete Audit Trail
+            description: "Full history of all changes"
+            components:
+              - "Who made the change"
+              - "When the change occurred"
+              - "What was changed"
+              - "Why the change was made"
+          - name: Compliance Reporting
+            description: "Support for regulatory compliance"
+            capabilities:
+              - "Data lineage tracking"
+              - "Change approval workflows"
+              - "Retention policy enforcement"
+              - "Compliance dashboards"
+
+  - name: Error Handling and Recovery
+    description: Patterns for handling failures and ensuring reliability
+    categories:
+      - name: Error Types and Handling
+        description: Different types of errors and their handling
+        error_types:
+          - name: Validation Errors
+            description: "Schema or business rule violations"
+            handling:
+              - "Immediate rejection"
+              - "Detailed error messages"
+              - "User-friendly feedback"
+              - "Retry recommendations"
+          - name: System Errors
+            description: "Infrastructure or system failures"
+            handling:
+              - "Automatic retry with backoff"
+              - "Dead letter queue storage"
+              - "Alert generation"
+              - "Graceful degradation"
+          - name: Authorization Errors
+            description: "Permission and access violations"
+            handling:
+              - "Immediate rejection"
+              - "Security logging"
+              - "Access request workflows"
+              - "Audit trail updates"
+
+      - name: Recovery Mechanisms
+        description: Strategies for recovering from failures
+        mechanisms:
+          - name: Retry Policies
+            description: "Automatic retry for transient failures"
+            configuration:
+              - "Exponential backoff"
+              - "Maximum retry attempts"
+              - "Retry delay configuration"
+              - "Circuit breaker patterns"
+          - name: Dead Letter Queues
+            description: "Storage for unprocessable events"
+            purpose:
+              - "Failure analysis"
+              - "Manual intervention"
+              - "Batch reprocessing"
+              - "Data recovery"
+          - name: State Consistency
+            description: "Maintaining system consistency"
+            mechanisms:
+              - "Transactional updates"
+              - "Eventual consistency"
+              - "Conflict resolution"
+              - "State reconciliation"
+
+  - name: Retention and Cleanup
+    description: Data retention and cleanup strategies
+    categories:
+      - name: Retention Policies
+        description: Policies for retaining metadata over time
+        policies:
+          - name: Elasticsearch Retention
+            description: "Search index retention"
+            configuration:
+              - "Default 60-day retention"
+              - "Configurable retention periods"
+              - "Index lifecycle management"
+              - "Storage optimization"
+          - name: Database Retention
+            description: "Primary database retention"
+            configuration:
+              - "Configurable retention by entity type"
+              - "Soft delete preservation"
+              - "Hard delete scheduling"
+              - "Compliance requirements"
+          - name: Event Log Retention
+            description: "Event stream retention"
+            configuration:
+              - "Kafka topic retention"
+              - "Event replay capabilities"
+              - "Audit log preservation"
+              - "Archival strategies"
+
+      - name: Cleanup Mechanisms
+        description: Automated cleanup processes
+        mechanisms:
+          - name: Soft Deletion
+            description: "Status-based deletion"
+            implementation:
+              - "Status aspect with 'removed' flag"
+              - "Filtered query results"
+              - "Reversible operations"
+              - "Audit trail preservation"
+          - name: Hard Deletion
+            description: "Physical removal from storage"
+            implementation:
+              - "Permanent data removal"
+              - "Cascade deletion handling"
+              - "Referential integrity maintenance"
+              - "Backup preservation"
+          - name: Garbage Collection
+            description: "Automatic cleanup of expired data"
+            implementation:
+              - "Scheduled cleanup jobs"
+              - "Retention policy enforcement"
+              - "Storage optimization"
+              - "Performance maintenance"
+
+temporal_patterns:
+  - name: Batch Processing Windows
+    description: "Time-based processing strategies"
+    patterns:
+      - "Hourly processing windows"
+      - "Daily batch processing"
+      - "Real-time streaming"
+      - "Event-driven processing"
+  - name: Retention Timeframes
+    description: "Standard retention periods"
+    timeframes:
+      - "Search indices: 60 days (default)"
+      - "Timeline lookback: 7 days (default)"
+      - "Audit logs: Configurable (typically 1+ years)"
+      - "Cache TTL: Minutes to hours"
+
+integration_patterns:
+  - name: API Integration
+    description: "How external systems integrate with metadata lifecycle"
+    patterns:
+      - "REST API for synchronous operations"
+      - "GraphQL for flexible queries"
+      - "Kafka for event streaming"
+      - "WebSocket for real-time updates"
+  - name: Event Streaming
+    description: "Event-driven integration patterns"
+    patterns:
+      - "Producer-consumer architecture"
+      - "Event sourcing patterns"
+      - "Saga patterns for distributed transactions"
+      - "Event replay capabilities"
+
+usage_notes:
+  - "Metadata lifecycle follows event-driven architecture patterns"
+  - "MCPs are the current standard for metadata changes"
+  - "MCLs provide complete audit trail and downstream notification"
+  - "Versioning ensures historical preservation with optimized access"
+  - "Error handling provides resilience and reliability"
+  - "Retention policies balance storage costs with compliance requirements"
+  - "Timeline services provide user-friendly historical views"
+  - "System supports both real-time and batch processing modes"
